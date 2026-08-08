@@ -7,6 +7,7 @@ import EnhancementLayer from './components/EnhancementLayer';
 import './index.css';
 import './interactive.css';
 import './superstack.css';
+import './cms.css';
 
 const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
 
