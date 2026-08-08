@@ -1,8 +1,8 @@
+import type { CSSProperties } from 'react';
 import { motion } from 'motion/react';
-import { Activity, BarChart3, BookOpen, BrainCircuit, CircleDot, Clock3, FileSearch, GitBranch, HeartPulse, Layers3, Network, Orbit, Presentation, ShieldCheck, ShoppingBag, Sparkles, Target, Users2, Workflow } from 'lucide-react';
+import { BarChart3, BookOpen, BrainCircuit, CircleDot, FileSearch, GitBranch, HeartPulse, Layers3, Network, Orbit, Presentation, ShieldCheck, ShoppingBag, Sparkles, Users2 } from 'lucide-react';
 
 type Props={documentId:string;pageNumber:number};
-
 type Theme={name:string;accent:string;soft:string;ink:string;pattern:string;icon:typeof Sparkles};
 
 export const researchThemes:Record<string,Theme>={
@@ -19,9 +19,7 @@ export const researchThemes:Record<string,Theme>={
   'sme-digital-case':{name:'Transformation Dashboard',accent:'#d18a2d',soft:'#fff5e5',ink:'#593f1e',pattern:'kpi',icon:BarChart3},
   'scientific-poster':{name:'Research Storyboard',accent:'#ed5e4e',soft:'#fff0ed',ink:'#5b2b25',pattern:'poster',icon:Presentation},
 };
-
 const fallback:Theme={name:'Academic Research',accent:'#fe5f3a',soft:'#fff0eb',ink:'#3e302b',pattern:'grid',icon:BookOpen};
-
 export const getResearchTheme=(id:string)=>researchThemes[id]??fallback;
 
 function Flow({accent}:{accent:string}){const nodes=['Search','Screen','Eligibility','Included'];return <div className='rv-flow'>{nodes.map((n,i)=><motion.div key={n} className='rv-flow-node' initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:i*.08}}><span style={{background:accent}}>{i+1}</span><b>{n}</b>{i<nodes.length-1&&<i/>}</motion.div>)}</div>}
@@ -49,7 +47,7 @@ export default function ResearchVisualScene({documentId,pageNumber}:Props){
   else if(documentId==='fraud-ai-review') visual=<Matrix accent={t.accent}/>;
   else if(documentId==='sme-digital-case') visual=<KPIs accent={t.accent}/>;
   else if(documentId==='scientific-poster') visual=<Poster/>;
-  return <motion.section className={`research-visual rv-${t.pattern}`} style={{'--rv-accent':t.accent,'--rv-soft':t.soft,'--rv-ink':t.ink} as React.CSSProperties} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{duration:.35}}>
+  return <motion.section className={`research-visual rv-${t.pattern}`} style={{'--rv-accent':t.accent,'--rv-soft':t.soft,'--rv-ink':t.ink} as CSSProperties} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{duration:.35}}>
     <header><span style={{background:t.soft,color:t.accent}}><Icon size={15}/>{t.name}</span><small>Interactive research layer • p.{String(pageNumber).padStart(2,'0')}</small></header>
     {visual}
   </motion.section>
