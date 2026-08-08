@@ -1,9 +1,10 @@
 import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowLeft, BookOpen, Check, ChevronLeft, ChevronRight, FileText, Minus, Plus, ShieldCheck, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, Check, ChevronLeft, ChevronRight, FileText, Minus, Play, Plus, ShieldCheck, X } from 'lucide-react';
 import type { ResearchDocument } from '../data/researchDocuments';
 import { getEnhancedResearchDocument } from '../data/enhancedResearch';
+import ResearchStoryMode from './ResearchStoryMode';
 import ResearchVisualScene, { getResearchTheme } from './ResearchVisualScene';
 import './research-reader.css';
 import './research-visuals.css';
@@ -15,15 +16,20 @@ export default function FullResearchReader({document,onClose,onRequest}:Props){
   const theme=getResearchTheme(enhancedDocument.id);
   const [page,setPage]=useState(0);
   const [zoom,setZoom]=useState(100);
-  useEffect(()=>{setPage(0);setZoom(100)},[enhancedDocument.id]);
+  const [storyOpen,setStoryOpen]=useState(false);
+  useEffect(()=>{setPage(0);setZoom(100);setStoryOpen(false)},[enhancedDocument.id]);
   useEffect(()=>{
     const key=(event:KeyboardEvent)=>{
-      if(event.key==='Escape') onClose();
+      if(event.key==='Escape') {
+        if(storyOpen) setStoryOpen(false);
+        else onClose();
+      }
+      if(storyOpen) return;
       if(event.key==='ArrowLeft') setPage(v=>Math.min(enhancedDocument.pages.length-1,v+1));
       if(event.key==='ArrowRight') setPage(v=>Math.max(0,v-1));
     };
     window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
-  },[enhancedDocument.pages.length,onClose]);
+  },[enhancedDocument.pages.length,onClose,storyOpen]);
   const current=enhancedDocument.pages[page];
   const progress=useMemo(()=>Math.round(((page+1)/enhancedDocument.pages.length)*100),[page,enhancedDocument.pages.length]);
   const go=(n:number)=>setPage(Math.max(0,Math.min(enhancedDocument.pages.length-1,n)));
@@ -33,7 +39,7 @@ export default function FullResearchReader({document,onClose,onRequest}:Props){
     <motion.section className={`reader-shell reader-theme-${enhancedDocument.id}`} style={shellStyle} role='dialog' aria-modal='true' aria-label={`معاينة البحث الكامل: ${enhancedDocument.title}`} onClick={e=>e.stopPropagation()} initial={{opacity:0,y:24,scale:.985}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:18,scale:.99}}>
       <header className='reader-topbar'>
         <div className='reader-title'><span className='reader-brand'>م</span><div><small>{theme.name} • {enhancedDocument.studyType} • {enhancedDocument.standard}</small><strong>{enhancedDocument.title}</strong></div></div>
-        <div className='reader-tools'><span className='reader-page-count'><BookOpen size={14}/>{enhancedDocument.pageCount} صفحة</span><button type='button' onClick={()=>setZoom(v=>Math.max(80,v-10))} aria-label='تصغير'><Minus size={15}/></button><b>{zoom}%</b><button type='button' onClick={()=>setZoom(v=>Math.min(120,v+10))} aria-label='تكبير'><Plus size={15}/></button><button className='reader-close' type='button' onClick={onClose} aria-label='إغلاق'><X size={18}/></button></div>
+        <div className='reader-tools'><span className='reader-page-count'><BookOpen size={14}/>{enhancedDocument.pageCount} صفحة</span><button className='reader-story-button' type='button' onClick={()=>setStoryOpen(true)} aria-label='تشغيل العرض المتحرك'><Play size={14}/><span>Story</span></button><button type='button' onClick={()=>setZoom(v=>Math.max(80,v-10))} aria-label='تصغير'><Minus size={15}/></button><b>{zoom}%</b><button type='button' onClick={()=>setZoom(v=>Math.min(120,v+10))} aria-label='تكبير'><Plus size={15}/></button><button className='reader-close' type='button' onClick={onClose} aria-label='إغلاق'><X size={18}/></button></div>
       </header>
 
       <div className='reader-progress'><motion.span animate={{width:`${progress}%`}}/></div>
@@ -70,7 +76,8 @@ export default function FullResearchReader({document,onClose,onRequest}:Props){
         </main>
       </div>
 
-      <footer className='reader-bottombar'><div><span>صفحة {page+1} من {enhancedDocument.pageCount} • {theme.name}</span><div className='reader-dots'>{enhancedDocument.pages.map((_,index)=><button aria-label={`صفحة ${index+1}`} type='button' className={index===page?'active':''} onClick={()=>go(index)} key={index}/>)}</div></div><button type='button' className='btn accent' onClick={onRequest}>أبغى بحث بنفس المستوى <ArrowLeft size={16}/></button></footer>
+      <footer className='reader-bottombar'><div><span>صفحة {page+1} من {enhancedDocument.pageCount} • {theme.name}</span><div className='reader-dots'>{enhancedDocument.pages.map((_,index)=><button aria-label={`صفحة ${index+1}`} type='button' className={index===page?'active':''} onClick={()=>go(index)} key={index}/>)}</div></div><div className='reader-footer-actions'><button type='button' className='reader-story-cta' onClick={()=>setStoryOpen(true)}><Play size={15}/> عرض البحث كمشهد متحرك</button><button type='button' className='btn accent' onClick={onRequest}>أبغى بحث بنفس المستوى <ArrowLeft size={16}/></button></div></footer>
+      <AnimatePresence>{storyOpen&&<ResearchStoryMode document={enhancedDocument} onClose={()=>setStoryOpen(false)}/>}</AnimatePresence>
     </motion.section>
   </motion.div>;
 }
