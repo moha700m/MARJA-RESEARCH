@@ -4,6 +4,7 @@ import App from './App';
 import EnhancementLayer from './components/EnhancementLayer';
 import './index.css';
 import './interactive.css';
+import './superstack.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
