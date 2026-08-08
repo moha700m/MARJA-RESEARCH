@@ -39,6 +39,7 @@ function applySeo(settings: MarjaSiteSettings) {
           '@id': 'https://marja-live-moha700ms-projects.vercel.app/#organization',
           name: settings.brandName,
           url: 'https://marja-live-moha700ms-projects.vercel.app/',
+          identifier: settings.freelanceDocument || undefined,
         },
         {
           '@type': 'WebSite',
@@ -95,6 +96,22 @@ function applyWhatsApp(settings: MarjaSiteSettings) {
   link.href = `https://wa.me/${digits}`;
 }
 
+function applyCredential(settings: MarjaSiteSettings) {
+  let node = document.getElementById('cms-business-credential');
+  if (!settings.features.showFreelanceDocument || !settings.freelanceDocument.trim()) {
+    node?.remove();
+    return;
+  }
+  if (!node) {
+    node = document.createElement('div');
+    node.id = 'cms-business-credential';
+    node.className = 'cms-business-credential';
+    const proof = document.getElementById('enhanced-proof-host');
+    proof?.insertAdjacentElement('afterend', node);
+  }
+  node.innerHTML = `<div class="wrap"><span class="credential-dot"></span><div><small>توثيق العمل</small><strong>وثيقة العمل الحر</strong></div><code>${settings.freelanceDocument}</code><span class="credential-copy">نشاط موثّق</span></div>`;
+}
+
 function recalculate(settings: MarjaSiteSettings) {
   const calculator = document.querySelector<HTMLElement>('.calculator');
   if (!calculator) return;
@@ -118,6 +135,7 @@ function applySettings(settings: MarjaSiteSettings) {
   applySeo(settings);
   applyAnnouncement(settings);
   applyWhatsApp(settings);
+  applyCredential(settings);
 
   setText('.logo', settings.brandName);
   const logo = document.querySelector<HTMLElement>('.logo');
