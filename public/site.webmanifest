@@ -1,0 +1,14 @@
+{
+  "name": "مَرجِع",
+  "short_name": "مَرجِع",
+  "lang": "ar-SA",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#17201d",
+  "description": "دعم أكاديمي وبحثي عربي منظم للطلاب الجامعيين.",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
