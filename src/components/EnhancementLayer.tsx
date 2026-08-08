@@ -6,6 +6,9 @@ import GSAPExperience from './GSAPExperience';
 import InteractiveBento from './InteractiveBento';
 import MobileQuickDrawer from './MobileQuickDrawer';
 import ScrollProgress from './ScrollProgress';
+import ThemeSwitcher from './ThemeSwitcher';
+import WhatsAppProjectStory from './WhatsAppProjectStory';
+import '../premium-experience.css';
 
 function ProofStrip() {
   const items = [
@@ -20,10 +23,12 @@ function ProofStrip() {
 export default function EnhancementLayer() {
   const [bentoHost, setBentoHost] = useState<HTMLElement | null>(null);
   const [proofHost, setProofHost] = useState<HTMLElement | null>(null);
+  const [whatsappHost, setWhatsappHost] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     const portfolio = document.getElementById('work');
     const hero = document.getElementById('top');
+    const price = document.getElementById('price');
     if (portfolio && !document.getElementById('enhanced-bento-host')) {
       const host = document.createElement('div');
       host.id = 'enhanced-bento-host';
@@ -35,6 +40,12 @@ export default function EnhancementLayer() {
       host.id = 'enhanced-proof-host';
       hero.insertAdjacentElement('afterend', host);
       setProofHost(host);
+    }
+    if (price && !document.getElementById('whatsapp-story-host')) {
+      const host = document.createElement('div');
+      host.id = 'whatsapp-story-host';
+      price.parentNode?.insertBefore(host, price);
+      setWhatsappHost(host);
     }
 
     document.querySelectorAll<HTMLElement>('.page-chip').forEach((node) => { node.textContent = '20 صفحة'; });
@@ -92,10 +103,12 @@ export default function EnhancementLayer() {
   return <>
     <GSAPExperience/>
     <ScrollProgress/>
+    <ThemeSwitcher/>
     <Toaster position='top-center' richColors closeButton visibleToasts={4} toastOptions={{duration:3600}}/>
     <div className='ambient-cursor' aria-hidden='true'/>
     {proofHost ? createPortal(<ProofStrip/>, proofHost) : null}
     {bentoHost ? createPortal(<InteractiveBento/>, bentoHost) : null}
+    {whatsappHost ? createPortal(<WhatsAppProjectStory/>, whatsappHost) : null}
     <MobileQuickDrawer/>
   </>;
 }
