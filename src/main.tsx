@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import AdminAccessGate from './admin/AdminAccessGate';
 import AdminApp from './admin/AdminApp';
 import AdminCredentialControl from './admin/AdminCredentialControl';
 import CmsRuntimeBridge from './components/CmsRuntimeBridge';
@@ -14,6 +15,6 @@ const isAdminRoute = window.location.pathname === '/admin' || window.location.pa
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {isAdminRoute ? <><AdminApp/><AdminCredentialControl/></> : <><CmsRuntimeBridge/><EnhancementLayer/><App/></>}
+    {isAdminRoute ? <AdminAccessGate><AdminApp/><AdminCredentialControl/></AdminAccessGate> : <><CmsRuntimeBridge/><EnhancementLayer/><App/></>}
   </StrictMode>
 );
