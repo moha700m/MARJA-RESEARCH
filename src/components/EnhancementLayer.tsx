@@ -1,0 +1,79 @@
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { motion } from 'motion/react';
+import InteractiveBento from './InteractiveBento';
+import ScrollProgress from './ScrollProgress';
+
+function ProofStrip() {
+  const items = [
+    ['12', 'نموذج بحث متخصص'],
+    ['20', 'صفحة لكل نموذج'],
+    ['240', 'صفحة معاينة داخل الموقع'],
+    ['5', 'مسارات تخصصية'],
+  ];
+  return <section className='proof-strip' aria-label='أرقام المنصة'><div className='wrap proof-grid'>{items.map(([value,label],index)=><motion.div key={label} initial={{opacity:0,y:14}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:index*.07}}><strong>{value}</strong><span>{label}</span></motion.div>)}</div></section>;
+}
+
+export default function EnhancementLayer() {
+  const [bentoHost, setBentoHost] = useState<HTMLElement | null>(null);
+  const [proofHost, setProofHost] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const portfolio = document.getElementById('work');
+    const hero = document.getElementById('top');
+    if (portfolio && !document.getElementById('enhanced-bento-host')) {
+      const host = document.createElement('div');
+      host.id = 'enhanced-bento-host';
+      portfolio.parentNode?.insertBefore(host, portfolio);
+      setBentoHost(host);
+    }
+    if (hero && !document.getElementById('enhanced-proof-host')) {
+      const host = document.createElement('div');
+      host.id = 'enhanced-proof-host';
+      hero.insertAdjacentElement('afterend', host);
+      setProofHost(host);
+    }
+
+    document.querySelectorAll<HTMLElement>('.page-chip').forEach((node) => { node.textContent = '20 صفحة'; });
+    const portfolioIntro = document.querySelector<HTMLElement>('.work-head > p');
+    if (portfolioIntro) portfolioIntro.textContent = 'كل نموذج يفتح كبحث كامل من 20 صفحة: ملخص، فجوة بحثية، أدبيات، منهج، عينة، قياس، أخلاقيات، تحليل، مناقشة، توصيات ومراجع.';
+
+    const pointer = (event: PointerEvent) => {
+      document.documentElement.style.setProperty('--cursor-x', `${event.clientX}px`);
+      document.documentElement.style.setProperty('--cursor-y', `${event.clientY}px`);
+      const target = (event.target as Element | null)?.closest<HTMLElement>('.service,.showcase-card,.case-study,.calculator,.order-form,.track,.how-grid article,.faq-list details');
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      target.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
+      target.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
+    };
+    window.addEventListener('pointermove', pointer, { passive: true });
+
+    const steps = Array.from(document.querySelectorAll<HTMLElement>('.hero-card .step'));
+    let active = 0;
+    const tick = () => {
+      steps.forEach((step,index) => step.classList.toggle('is-live', index === active));
+      active = (active + 1) % Math.max(steps.length, 1);
+    };
+    tick();
+    const timer = window.setInterval(tick, 2400);
+
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.classList.add('enhanced-visible');
+    }), { threshold: .12 });
+    document.querySelectorAll('.section,.portfolio-section,.price-section,.order-section,.track').forEach((node) => observer.observe(node));
+
+    return () => {
+      window.removeEventListener('pointermove', pointer);
+      window.clearInterval(timer);
+      observer.disconnect();
+    };
+  }, []);
+
+  return <>
+    <ScrollProgress/>
+    <div className='ambient-cursor' aria-hidden='true'/>
+    {proofHost ? createPortal(<ProofStrip/>, proofHost) : null}
+    {bentoHost ? createPortal(<InteractiveBento/>, bentoHost) : null}
+  </>;
+}
