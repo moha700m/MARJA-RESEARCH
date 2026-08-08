@@ -26,8 +26,12 @@ function applySeo(settings: MarjaSiteSettings) {
   setMeta('keywords', settings.seoKeywords.join(', '));
   setMeta('og:title', settings.seoTitle, true);
   setMeta('og:description', settings.seoDescription, true);
+  setMeta('og:url', 'https://marja.info/', true);
   setMeta('twitter:title', settings.seoTitle);
   setMeta('twitter:description', settings.seoDescription);
+
+  const canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (canonical) canonical.href = 'https://marja.info/';
 
   const jsonLd = document.getElementById('marja-jsonld');
   if (jsonLd) {
@@ -36,23 +40,23 @@ function applySeo(settings: MarjaSiteSettings) {
       '@graph': [
         {
           '@type': 'Organization',
-          '@id': 'https://marja-live-moha700ms-projects.vercel.app/#organization',
+          '@id': 'https://marja.info/#organization',
           name: settings.brandName,
-          url: 'https://marja-live-moha700ms-projects.vercel.app/',
+          url: 'https://marja.info/',
           identifier: settings.freelanceDocument || undefined,
         },
         {
           '@type': 'WebSite',
-          '@id': 'https://marja-live-moha700ms-projects.vercel.app/#website',
-          url: 'https://marja-live-moha700ms-projects.vercel.app/',
+          '@id': 'https://marja.info/#website',
+          url: 'https://marja.info/',
           name: settings.brandName,
           inLanguage: 'ar-SA',
-          publisher: { '@id': 'https://marja-live-moha700ms-projects.vercel.app/#organization' },
+          publisher: { '@id': 'https://marja.info/#organization' },
         },
         {
           '@type': 'Service',
           name: 'الدعم الأكاديمي والبحثي',
-          provider: { '@id': 'https://marja-live-moha700ms-projects.vercel.app/#organization' },
+          provider: { '@id': 'https://marja.info/#organization' },
           areaServed: 'SA',
           description: settings.seoDescription,
         },
