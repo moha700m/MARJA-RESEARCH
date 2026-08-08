@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Toaster, toast } from 'sonner';
 import GSAPExperience from './GSAPExperience';
+import HeroDarkBackground from './HeroDarkBackground';
 import InteractiveBento from './InteractiveBento';
 import MobileQuickDrawer from './MobileQuickDrawer';
 import ScrollProgress from './ScrollProgress';
@@ -21,6 +22,7 @@ function ProofStrip() {
 }
 
 export default function EnhancementLayer() {
+  const [heroVideoHost, setHeroVideoHost] = useState<HTMLElement | null>(null);
   const [bentoHost, setBentoHost] = useState<HTMLElement | null>(null);
   const [proofHost, setProofHost] = useState<HTMLElement | null>(null);
   const [whatsappHost, setWhatsappHost] = useState<HTMLElement | null>(null);
@@ -29,6 +31,16 @@ export default function EnhancementLayer() {
     const portfolio = document.getElementById('work');
     const hero = document.getElementById('top');
     const price = document.getElementById('price');
+    if (hero) {
+      const existing = document.getElementById('hero-dark-video-host') as HTMLElement | null;
+      if (existing) setHeroVideoHost(existing);
+      else {
+        const host = document.createElement('div');
+        host.id = 'hero-dark-video-host';
+        hero.prepend(host);
+        setHeroVideoHost(host);
+      }
+    }
     if (portfolio && !document.getElementById('enhanced-bento-host')) {
       const host = document.createElement('div');
       host.id = 'enhanced-bento-host';
@@ -106,6 +118,7 @@ export default function EnhancementLayer() {
     <ThemeSwitcher/>
     <Toaster position='top-center' richColors closeButton visibleToasts={4} toastOptions={{duration:3600}}/>
     <div className='ambient-cursor' aria-hidden='true'/>
+    {heroVideoHost ? createPortal(<HeroDarkBackground/>, heroVideoHost) : null}
     {proofHost ? createPortal(<ProofStrip/>, proofHost) : null}
     {bentoHost ? createPortal(<InteractiveBento/>, bentoHost) : null}
     {whatsappHost ? createPortal(<WhatsAppProjectStory/>, whatsappHost) : null}
