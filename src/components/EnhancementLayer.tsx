@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
+import { Toaster, toast } from 'sonner';
+import GSAPExperience from './GSAPExperience';
 import InteractiveBento from './InteractiveBento';
+import MobileQuickDrawer from './MobileQuickDrawer';
 import ScrollProgress from './ScrollProgress';
 
 function ProofStrip() {
@@ -63,17 +66,36 @@ export default function EnhancementLayer() {
     }), { threshold: .12 });
     document.querySelectorAll('.section,.portfolio-section,.price-section,.order-section,.track').forEach((node) => observer.observe(node));
 
+    const relayAlerts = () => {
+      document.querySelectorAll<HTMLElement>('.alert.success:not([data-toast-relayed])').forEach((node) => {
+        node.dataset.toastRelayed = 'true';
+        const text = node.innerText.trim();
+        if (text) toast.success('تم استلام طلبك', { description: text.replace(/\s+/g,' ').slice(0,150) });
+      });
+      document.querySelectorAll<HTMLElement>('.alert.error:not([data-toast-relayed])').forEach((node) => {
+        node.dataset.toastRelayed = 'true';
+        const text = node.innerText.trim();
+        if (text) toast.error('راجع البيانات', { description: text.replace(/\s+/g,' ').slice(0,150) });
+      });
+    };
+    const toastObserver = new MutationObserver(relayAlerts);
+    toastObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+
     return () => {
       window.removeEventListener('pointermove', pointer);
       window.clearInterval(timer);
       observer.disconnect();
+      toastObserver.disconnect();
     };
   }, []);
 
   return <>
+    <GSAPExperience/>
     <ScrollProgress/>
+    <Toaster position='top-center' richColors closeButton visibleToasts={4} toastOptions={{duration:3600}}/>
     <div className='ambient-cursor' aria-hidden='true'/>
     {proofHost ? createPortal(<ProofStrip/>, proofHost) : null}
     {bentoHost ? createPortal(<InteractiveBento/>, bentoHost) : null}
+    <MobileQuickDrawer/>
   </>;
 }
