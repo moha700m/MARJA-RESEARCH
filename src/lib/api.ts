@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 type ApiResponse<T = unknown> = { data: T };
 
 type RequestOptions = {
@@ -27,7 +29,40 @@ function normalizeCmsEstimate(url: string, data: unknown) {
   }
 }
 
+async function supabaseRequest<T>(url: string, options: RequestOptions): Promise<ApiResponse<T> | null> {
+  if (url === '/api/requests' && options.method === 'POST') {
+    const payload = normalizeCmsEstimate(url, options.data) as Record<string, unknown>;
+    const { data, error } = await supabase.rpc('marja_create_request', {
+      p_name: String(payload.name ?? ''),
+      p_contact: String(payload.contact ?? ''),
+      p_university: String(payload.university ?? ''),
+      p_major: String(payload.major ?? ''),
+      p_title: String(payload.title ?? ''),
+      p_deadline: String(payload.deadline ?? ''),
+      p_details: String(payload.details ?? ''),
+      p_service: String(payload.service ?? ''),
+      p_pages: Number(payload.pages ?? 0),
+      p_urgency: String(payload.urgency ?? ''),
+      p_estimate: Number(payload.estimate ?? 0),
+    });
+    if (error) throw new Error(error.message);
+    return { data: { id: String(data) } as T };
+  }
+
+  if (options.method === 'GET' && url.startsWith('/api/requests/')) {
+    const id = decodeURIComponent(url.slice('/api/requests/'.length));
+    const { data, error } = await supabase.rpc('marja_track_request', { p_id: id });
+    if (error || !data) throw new Error(error?.message || 'Request not found');
+    return { data: data as T };
+  }
+
+  return null;
+}
+
 async function request<T = unknown>(url: string, options: RequestOptions): Promise<ApiResponse<T>> {
+  const databaseResponse = await supabaseRequest<T>(url, options);
+  if (databaseResponse) return databaseResponse;
+
   const data = normalizeCmsEstimate(url, options.data);
   const response = await fetch(url, {
     method: options.method,
