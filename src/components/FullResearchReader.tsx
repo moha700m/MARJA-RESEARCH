@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronLeft, ChevronRight, FileText, Minus, Plus, ShieldCheck, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, Check, ChevronLeft, ChevronRight, FileText, Minus, Plus, ShieldCheck, X } from 'lucide-react';
 import type { ResearchDocument } from '../data/researchDocuments';
 import './research-reader.css';
 
