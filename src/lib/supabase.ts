@@ -30,6 +30,7 @@ export type MarjaSiteSettings = {
   secondaryCta: string;
   whatsapp: string;
   announcement: string;
+  freelanceDocument: string;
   seoTitle: string;
   seoDescription: string;
   seoKeywords: string[];
@@ -39,6 +40,7 @@ export type MarjaSiteSettings = {
     showPortfolio: boolean;
     showPricing: boolean;
     showTracking: boolean;
+    showFreelanceDocument: boolean;
   };
 };
 
@@ -52,11 +54,12 @@ export const fallbackSettings: MarjaSiteSettings = {
   secondaryCta: 'شوف نماذجنا',
   whatsapp: '',
   announcement: '',
+  freelanceDocument: 'FL-289426120',
   seoTitle: 'مَرجِع | دعم الأبحاث الجامعية',
   seoDescription: 'مَرجِع منصة عربية للدعم الأكاديمي: خطط بحث، مصادر ومراجع، تحليل بيانات، مراجعة وتنسيق وعروض جامعية.',
   seoKeywords: ['بحوث جامعية', 'خطة بحث', 'تحليل بيانات', 'مراجع أكاديمية', 'APA'],
   prices: { proposal: 89, sources: 109, review: 129, analysis: 189, slides: 139, full: 329 },
-  features: { showWhatsappStory: true, showPortfolio: true, showPricing: true, showTracking: true },
+  features: { showWhatsappStory: true, showPortfolio: true, showPricing: true, showTracking: true, showFreelanceDocument: true },
 };
 
 export async function loadMarjaSettings(): Promise<MarjaSiteSettings> {
