@@ -17,11 +17,11 @@ function resolve(mode:ThemeMode){
 
 export default function ThemeSwitcher(){
   const [mode,setMode]=useState<ThemeMode>(()=>{
-    if(typeof window==='undefined') return 'system';
+    if(typeof window==='undefined') return 'light';
     const saved=window.localStorage.getItem('marja-theme');
-    return saved==='light'||saved==='dark'||saved==='system'?saved:'system';
+    return saved==='light'||saved==='dark'||saved==='system'?saved:'light';
   });
-  const activeLabel=useMemo(()=>modes.find(item=>item.id===mode)?.label??'النظام',[mode]);
+  const activeLabel=useMemo(()=>modes.find(item=>item.id===mode)?.label??'فاتح',[mode]);
 
   useEffect(()=>{
     const media=window.matchMedia('(prefers-color-scheme: dark)');
