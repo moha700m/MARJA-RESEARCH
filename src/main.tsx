@@ -10,6 +10,7 @@ import './index.css';
 import './interactive.css';
 import './superstack.css';
 import './cms.css';
+import './topbar-accent.css';
 
 const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
 
