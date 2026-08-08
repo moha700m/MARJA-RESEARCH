@@ -1,0 +1,22 @@
+/* Final navigation color override: soft warm orange, gentle on the eyes. */
+.topbar{
+  background:linear-gradient(180deg,rgba(247,198,162,.96) 0%,rgba(243,187,145,.94) 100%)!important;
+  border-bottom:1px solid rgba(118,67,35,.14)!important;
+  box-shadow:0 10px 32px rgba(173,96,48,.10),inset 0 1px 0 rgba(255,255,255,.38)!important;
+  -webkit-backdrop-filter:saturate(135%) blur(20px)!important;
+  backdrop-filter:saturate(135%) blur(20px)!important;
+}
+.topbar .logo,.topbar .navlinks a{color:#5b321f!important;}
+.topbar .navlinks a{transition:color .18s ease,opacity .18s ease;}
+.topbar .navlinks a:hover{color:#2e1910!important;}
+.topbar .desktop-cta{background:#17201d!important;color:#fff!important;box-shadow:0 10px 24px rgba(23,32,29,.16)!important;}
+html[data-theme='dark'] .topbar{
+  background:linear-gradient(180deg,rgba(235,164,112,.94) 0%,rgba(224,145,91,.92) 100%)!important;
+  border-bottom-color:rgba(255,224,200,.14)!important;
+  box-shadow:0 12px 36px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,244,234,.18)!important;
+}
+html[data-theme='dark'] .topbar .logo,html[data-theme='dark'] .topbar .navlinks a{color:#301b10!important;}
+html[data-theme='dark'] .topbar .navlinks a:hover{color:#120b07!important;}
+@media(max-width:760px){
+  .topbar{background:rgba(246,190,150,.96)!important;}
+}
