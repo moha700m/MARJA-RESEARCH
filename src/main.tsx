@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 0.6 seconds
+Output:
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
@@ -5,17 +8,14 @@ import AdminAccessGate from './admin/AdminAccessGate';
 import AdminApp from './admin/AdminApp';
 import AdminCredentialControl from './admin/AdminCredentialControl';
 import CmsRuntimeBridge from './components/CmsRuntimeBridge';
-import EnhancementLayer from './components/EnhancementLayer';
 import './index.css';
-import './interactive.css';
-import './superstack.css';
 import './cms.css';
-import './topbar-accent.css';
 
 const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {isAdminRoute ? <AdminAccessGate><AdminApp/><AdminCredentialControl/></AdminAccessGate> : <><CmsRuntimeBridge/><EnhancementLayer/><App/></>}
+    {isAdminRoute ? <AdminAccessGate><AdminApp/><AdminCredentialControl/></AdminAccessGate> : <><CmsRuntimeBridge/><App/></>}
   </StrictMode>
 );
+
