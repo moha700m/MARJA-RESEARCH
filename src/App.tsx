@@ -1,10 +1,10 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import {
-  ArrowLeft, BarChart3, BookOpenCheck, BriefcaseBusiness, Check, CheckCircle2,
-  ChevronDown, Clock3, FileSearch, FileText, GraduationCap, Laptop2,
-  Microscope, Presentation, School, Search, Send, ShieldCheck, Sparkles,
-  Stethoscope, Users2, X
+  Activity, ArrowLeft, ArrowUpRight, BarChart3, BookOpenCheck, Bookmark, BriefcaseBusiness,
+  Check, CheckCircle2, ChevronDown, Clock3, Database, FileSearch, FileText, GitCompare,
+  GraduationCap, Laptop2, LayoutDashboard, Microscope, Plus, Presentation, School,
+  Search, Send, ShieldCheck, SlidersHorizontal, Sparkles, Stethoscope, Users2, X
 } from 'lucide-react';
 import FullResearchReader from './components/FullResearchReader';
 import { getResearchDocument } from './data/researchDocuments';
@@ -12,6 +12,7 @@ import { getResearchDocument } from './data/researchDocuments';
 type ServiceKey = 'proposal' | 'sources' | 'review' | 'analysis' | 'slides' | 'full';
 type CategoryKey = 'all' | 'health' | 'business' | 'education' | 'tech' | 'social';
 type TrackResult = { id: string; service: string; status: string; createdAt: string; deadline: string; title: string };
+type WorkspaceTab = 'overview' | 'library' | 'saved';
 type Service = { key: ServiceKey; title: string; short: string; price: number; icon: typeof FileText };
 type ShowcaseItem = {
   id: string;
@@ -128,6 +129,33 @@ const showcase: ShowcaseItem[] = [
     deliverables: ['Case framework', 'KPIs قبل/بعد', 'ملخص تنفيذي'], tags: ['Case Study', 'Digital', 'KPIs'],
     signal: 'سياق + دليل',
   },
+  {
+    id: 'influencer-purchase', category: 'business', title: 'مصداقية المؤثرين وقرار الشراء',
+    subtitle: 'نموذج قياس يربط الثقة بالنية الشرائية', studyType: 'Survey Research',
+    service: 'sources', standard: 'APA 7',
+    problem: 'الحديث عن تأثير المؤثرين يحتاج تعريف المصداقية وملاءمة المنتج قبل تفسير السلوك.',
+    outcome: 'نموذج مفاهيمي واستبيان يفرّق بين الخبرة والثقة والتشابه المدرك وقرار الشراء.',
+    deliverables: ['نموذج مفاهيمي', 'مقياس موثق', 'خطة فحص الثبات'], tags: ['Influencer', 'Trust', 'Marketing'],
+    signal: 'المفهوم قبل السؤال',
+  },
+  {
+    id: 'engagement-turnover', category: 'business', title: 'الارتباط الوظيفي ونية ترك العمل',
+    subtitle: 'تحليل موارد بشرية يضبط العوامل المربكة', studyType: 'Correlational Study',
+    service: 'analysis', standard: 'APA 7',
+    problem: 'العلاقة بين الارتباط ونية المغادرة قد تتأثر بالدعم والرضا والقطاع الوظيفي.',
+    outcome: 'خطة قياس وتحليل تفصل الارتباط عن العوامل المصاحبة وتوضح حدود الاستنتاج.',
+    deliverables: ['مقاييس موثقة', 'Codebook', 'نموذج انحدار'], tags: ['HR', 'Engagement', 'Turnover'],
+    signal: 'تحليل بلا قفزات',
+  },
+  {
+    id: 'scientific-poster', category: 'education', title: 'ملصق علمي وعرض مناقشة لمشروع صحي',
+    subtitle: 'تحويل تقرير كامل إلى قصة بصرية قابلة للشرح', studyType: 'Research Communication Project',
+    service: 'slides', standard: 'Scientific Poster',
+    problem: 'الملصق العلمي ليس ملخصًا مزحومًا؛ يحتاج تسلسلًا بصريًا يحافظ على دقة النتائج.',
+    outcome: 'Storyboard يربط السؤال والمنهج والنتائج والخلاصة مع فحص القراءة وكثافة النص.',
+    deliverables: ['Storyboard', 'ملصق علمي', 'أسئلة مناقشة'], tags: ['Poster', 'Presentation', 'Health'],
+    signal: 'الدليل يُشرح بصريًا',
+  },
 ];
 
 const heroSteps = [
@@ -149,12 +177,28 @@ function App() {
   const [portfolioFilter, setPortfolioFilter] = useState<CategoryKey>('all');
   const [activeSample, setActiveSample] = useState<ShowcaseItem | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>('overview');
+  const [workspaceQuery, setWorkspaceQuery] = useState('');
+  const [workspaceCategory, setWorkspaceCategory] = useState<CategoryKey>('all');
+  const [savedIds, setSavedIds] = useState<string[]>(['ai-education-prisma', 'nursing-burnout']);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const selected = services.find((item) => item.key === service) ?? services[5];
   const filteredShowcase = useMemo(
     () => portfolioFilter === 'all' ? showcase : showcase.filter((item) => item.category === portfolioFilter),
     [portfolioFilter],
   );
+  const workspaceItems = useMemo(() => {
+    const query = workspaceQuery.trim().toLocaleLowerCase('ar');
+    return showcase.filter((item) => {
+      const matchesTab = workspaceTab !== 'saved' || savedIds.includes(item.id);
+      const matchesCategory = workspaceCategory === 'all' || item.category === workspaceCategory;
+      const haystack = [item.title, item.subtitle, item.studyType, item.standard, ...item.tags].join(' ').toLocaleLowerCase('ar');
+      return matchesTab && matchesCategory && (!query || haystack.includes(query));
+    });
+  }, [savedIds, workspaceCategory, workspaceQuery, workspaceTab]);
+  const compareItems = useMemo(() => showcase.filter((item) => compareIds.includes(item.id)), [compareIds]);
   const activeDocument = activeSample ? getResearchDocument(activeSample.id) : null;
   const estimate = useMemo(() => {
     const extraPages = Math.max(0, pages - 5) * 8;
@@ -172,6 +216,23 @@ function App() {
     setActiveSample(null);
     document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const toggleSaved = (id: string) => setSavedIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  const toggleCompare = (id: string) => setCompareIds((current) => {
+    if (current.includes(id)) return current.filter((item) => item !== id);
+    return current.length >= 2 ? [...current.slice(1), id] : [...current, id];
+  });
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setLibraryOpen(false);
+        setCompareOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   async function submitOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -239,6 +300,7 @@ function App() {
           <nav className='wrap nav'>
             <a href='#top' className='logo'><span>م</span><strong>مَرجِع</strong><small>RESEARCH STUDIO</small></a>
             <div className='navlinks'>
+              <a href='#workspace'>مساحة البحث</a>
               <a href='#services'>الخدمات</a>
               <a href='#work'>مكتبة الأبحاث</a>
               <a href='#how'>كيف نعمل</a>
@@ -288,6 +350,49 @@ function App() {
           </div>
         </section>
 
+        <section className='workspace-section section' id='workspace'>
+          <div className='wrap'>
+            <div className='workspace-intro'>
+              <div><span className='eyebrow'>مَرجِع OS / مساحة البحث</span><h2>كل بحث له<br /><em>لوحة تشغيل.</em></h2><p>مو معرض أغلفة. هذه مساحة SaaS تختار منها المسار، تحفظ دراسة، تقارن منهجين، وتفتح الملف الكامل عندما تحتاج التفاصيل.</p></div>
+              <div className='workspace-intro-actions'><span className='workspace-live'><span className='live-dot' /> النظام يعمل</span><button className='btn light' type='button' onClick={() => setLibraryOpen(true)}>فتح كل الملفات <ArrowLeft size={16} /></button></div>
+            </div>
+
+            <div className='workspace-frame'>
+              <aside className='workspace-sidebar'>
+                <div className='workspace-sidebar-brand'><span>م</span><div><b>مَرجِع</b><small>RESEARCH OS</small></div></div>
+                <span className='workspace-sidebar-label'>مساحة العمل</span>
+                <nav className='workspace-side-nav' aria-label='مساحة البحث'>
+                  {([{ key: 'overview', label: 'نظرة عامة', icon: LayoutDashboard }, { key: 'library', label: 'كل الدراسات', icon: Database }, { key: 'saved', label: 'المحفوظة', icon: Bookmark }] as Array<{ key: WorkspaceTab; label: string; icon: typeof LayoutDashboard }>).map(({ key, label, icon: Icon }) => <button key={key} type='button' className={workspaceTab === key ? 'active' : ''} onClick={() => setWorkspaceTab(key)}><Icon size={16} /><span>{label}</span>{key === 'saved' && <b>{savedIds.length}</b>}</button>)}
+                </nav>
+                <span className='workspace-sidebar-label'>النظام</span>
+                <div className='workspace-side-links'><a href='#how'><SlidersHorizontal size={15} /> طريقة البناء</a><a href='#integrity'><ShieldCheck size={15} /> بوابة النزاهة</a></div>
+                <div className='workspace-side-note'><Activity size={17} /><div><b>آخر مزامنة</b><span>منهجيات ومراجع محدثة</span><small>منذ 4 دقائق</small></div></div>
+              </aside>
+
+              <div className='workspace-main'>
+                <div className='workspace-topbar'><div><small>مَرجِع / مساحة الباحث</small><h3>لوحة الدراسات</h3></div><div className='workspace-top-actions'><label className='workspace-search'><Search size={17} /><input value={workspaceQuery} onChange={(event) => setWorkspaceQuery(event.target.value)} placeholder='ابحث عن موضوع أو منهج...' aria-label='ابحث في الدراسات' /></label><button className='workspace-add' type='button' onClick={goOrder}><Plus size={16} /> بحث جديد</button></div></div>
+                <div className='workspace-metrics'><div><span>ملفات كاملة</span><b>12</b><small>20 صفحة لكل ملف</small></div><div><span>منهجيات</span><b>08</b><small>كمي · نوعي · مراجعات</small></div><div><span>قابل للتتبع</span><b>100%</b><small>مصادر وملاحظات واضحة</small></div><div className='workspace-metric-accent'><span>نتائج مختلقة</span><b>00</b><small>لا أرقام بلا بيانات</small></div></div>
+
+                <div className='workspace-main-grid'>
+                  <div className='workspace-catalog'>
+                    <div className='workspace-catalog-head'><div><span className='workspace-eyebrow'>CATALOG / {workspaceTab === 'saved' ? 'SAVED' : 'LIVE'}</span><h4>{workspaceTab === 'saved' ? 'الدراسات المحفوظة' : 'ملفات بحث جاهزة للتصفح'}</h4></div><span className='workspace-result-count'>{workspaceItems.length} من {showcase.length}</span></div>
+                    <div className='workspace-filters'>{categories.map(({ key, label }) => <button key={key} type='button' className={workspaceCategory === key ? 'active' : ''} onClick={() => setWorkspaceCategory(key)}>{label}</button>)}</div>
+                    <div className='workspace-study-list'>
+                      {workspaceItems.slice(0, workspaceTab === 'overview' ? 4 : 6).map((item, index) => <motion.article key={item.id} className='workspace-study-card' role='button' tabIndex={0} onClick={() => setActiveSample(item)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') setActiveSample(item); }} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .1 }} transition={{ delay: index * .045 }}>
+                        <div className='workspace-study-index'><span>0{index + 1}</span><div className={'study-signal signal-' + item.category} /></div><div className='workspace-study-content'><div className='workspace-study-meta'><span>{item.studyType}</span><b>{item.standard}</b></div><h5>{item.title}</h5><p>{item.outcome}</p><div className='workspace-study-tags'>{item.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</div></div><div className='workspace-study-actions'><button type='button' className={savedIds.includes(item.id) ? 'saved' : ''} onClick={(event) => { event.stopPropagation(); toggleSaved(item.id); }} aria-label={savedIds.includes(item.id) ? 'إزالة من المحفوظة' : 'حفظ الدراسة'} aria-pressed={savedIds.includes(item.id)}><Bookmark size={16} fill={savedIds.includes(item.id) ? 'currentColor' : 'none'} /></button><button type='button' className={compareIds.includes(item.id) ? 'selected' : ''} onClick={(event) => { event.stopPropagation(); toggleCompare(item.id); }} aria-label='إضافة للمقارنة' aria-pressed={compareIds.includes(item.id)}><GitCompare size={16} /></button><ArrowUpRight size={17} className='workspace-open-icon' /></div>
+                      </motion.article>)}
+                      {workspaceItems.length === 0 && <div className='workspace-empty'><Search size={20} /><b>ما لقينا دراسة بهذا الوصف</b><span>غيّر كلمة البحث أو أعد الفلترة.</span></div>}
+                    </div>
+                    <div className='workspace-catalog-foot'><span><ShieldCheck size={15} /> كل ملف يفتح كبحث كامل داخل الموقع</span><button type='button' onClick={() => setLibraryOpen(true)}>عرض المكتبة <ArrowLeft size={14} /></button></div>
+                  </div>
+
+                  <aside className='workspace-insights'><div className='workspace-insights-head'><div><span className='workspace-eyebrow'>METHOD SIGNALS</span><h4>إشارات قبل أن تبدأ</h4></div><Sparkles size={18} /></div><div className='method-signal'><span>01</span><div><b>السؤال محدد</b><small>كل ملف يبدأ بفجوة قابلة للفحص.</small></div><i>✓</i></div><div className='method-signal'><span>02</span><div><b>الأداة لها وظيفة</b><small>لا استبيان أو جدول بلا علاقة بالسؤال.</small></div><i>✓</i></div><div className='method-signal'><span>03</span><div><b>النتيجة لها مصدر</b><small>القالب يوضح أين تبدأ البيانات الفعلية.</small></div><i>✓</i></div><div className='workspace-compare-box'><div><GitCompare size={18} /><div><b>قارن دراستين</b><small>{compareIds.length ? `${compareIds.length} من 2 محددة` : 'اختر دراستين من القائمة'}</small></div></div><button type='button' disabled={compareIds.length < 2} onClick={() => setCompareOpen(true)}>فتح المقارنة <ArrowLeft size={14} /></button></div></aside>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className='featured-section section wrap' aria-labelledby='featured-title'>
           <div className='section-head'>
             <div><span className='eyebrow'>لمحة من طريقة البناء</span><h2 id='featured-title'>البحث القوي<br />يُرى من هيكله.</h2></div>
@@ -317,7 +422,7 @@ function App() {
           <div className='wrap'>
             <motion.div className='library-compact-head' initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
               <div><span className='eyebrow'>مكتبة الأبحاث</span><h2>شوف المستوى<br />بدون زحمة.</h2><p>ثلاث لمحات كافية لتفهم طريقة البناء. المكتبة الكاملة تفتح عند الطلب في مساحة مستقلة.</p></div>
-              <div className='library-compact-action'><div><b>09</b><span>نماذج قابلة للتصفح</span></div><button className='btn dark' type='button' onClick={() => setLibraryOpen(true)}>استكشف المكتبة كاملة <ArrowLeft size={16} /></button></div>
+              <div className='library-compact-action'><div><b>12</b><span>ملفًا كاملًا قابلًا للتصفح</span></div><button className='btn dark' type='button' onClick={() => setLibraryOpen(true)}>استكشف المكتبة كاملة <ArrowLeft size={16} /></button></div>
             </motion.div>
             <div className='library-spotlights'>
               {showcase.slice(0, 3).map((item, index) => (
@@ -340,6 +445,16 @@ function App() {
               </motion.section>
             </motion.div>
           )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {compareOpen && compareItems.length === 2 && <motion.div className='compare-modal-backdrop' role='presentation' onClick={() => setCompareOpen(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.section className='compare-modal' role='dialog' aria-modal='true' aria-labelledby='compare-modal-title' onClick={(event) => event.stopPropagation()} initial={{ opacity: 0, y: 24, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: .98 }}>
+              <header className='compare-modal-head'><div><span className='eyebrow'>RESEARCH COMPARE</span><h2 id='compare-modal-title'>الفرق يظهر في المنهج.</h2><p>مقارنة مختصرة تساعدك تختار المسار الصحيح قبل طلب المشروع.</p></div><button type='button' className='library-modal-close' onClick={() => setCompareOpen(false)} aria-label='إغلاق المقارنة'><X size={19} /></button></header>
+              <div className='compare-grid'>{compareItems.map((item) => <article key={item.id} className='compare-card'><div className='compare-card-top'><span>{item.studyType}</span><b>{item.standard}</b></div><h3>{item.title}</h3><p>{item.problem}</p><dl><div><dt>المخرج</dt><dd>{item.outcome}</dd></div><div><dt>يحتاج</dt><dd>{item.deliverables.join(' · ')}</dd></div><div><dt>الإشارة</dt><dd>{item.signal}</dd></div></dl><button type='button' className='btn dark full' onClick={() => { setCompareOpen(false); setActiveSample(item); }}>افتح الملف الكامل <ArrowLeft size={15} /></button></article>)}</div>
+              <footer className='compare-modal-foot'><span><ShieldCheck size={15} /> المقارنة تفحص التصميم والمخرج، لا تستبدل قراءة البحث الكامل.</span><button type='button' onClick={() => setCompareIds([])}>مسح المقارنة</button></footer>
+            </motion.section>
+          </motion.div>}
         </AnimatePresence>
 
         <section className='section wrap' id='services'>
