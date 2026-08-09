@@ -180,7 +180,14 @@ function App() {
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>('overview');
   const [workspaceQuery, setWorkspaceQuery] = useState('');
   const [workspaceCategory, setWorkspaceCategory] = useState<CategoryKey>('all');
-  const [savedIds, setSavedIds] = useState<string[]>(['ai-education-prisma', 'nursing-burnout']);
+  const [savedIds, setSavedIds] = useState<string[]>(() => {
+    try {
+      const saved = window.localStorage.getItem('marja-saved-studies');
+      return saved ? JSON.parse(saved) as string[] : ['ai-education-prisma', 'nursing-burnout'];
+    } catch {
+      return ['ai-education-prisma', 'nursing-burnout'];
+    }
+  });
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
 
@@ -233,6 +240,9 @@ function App() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
+  useEffect(() => {
+    try { window.localStorage.setItem('marja-saved-studies', JSON.stringify(savedIds)); } catch { /* local-only preference */ }
+  }, [savedIds]);
 
   async function submitOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
