@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.6 seconds
-Output:
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
@@ -18,4 +15,3 @@ createRoot(document.getElementById('root')!).render(
     {isAdminRoute ? <AdminAccessGate><AdminApp/><AdminCredentialControl/></AdminAccessGate> : <><CmsRuntimeBridge/><App/></>}
   </StrictMode>
 );
-
