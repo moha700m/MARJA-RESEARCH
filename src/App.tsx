@@ -337,7 +337,7 @@ function App() {
                 </div>
               ))}
             </div>
-            <div className='panel-foot'><span><ShieldCheck size={15} /> نتائج الأبحاث الفعلية فقط</span><b>18 صفحة قابلة للتصفح</b></div>
+            <div className='panel-foot'><span><ShieldCheck size={15} /> نتائج الأبحاث الفعلية فقط</span><b>20 صفحة قابلة للتصفح</b></div>
           </motion.aside>
         </section>
 
@@ -427,7 +427,7 @@ function App() {
             <div className='library-spotlights'>
               {showcase.slice(0, 3).map((item, index) => (
                 <motion.button type='button' key={item.id} className='library-spotlight' onClick={() => setActiveSample(item)} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .18 }} transition={{ delay: index * .08 }} whileHover={{ y: -5 }} whileTap={{ scale: .985 }}>
-                  <span className='spotlight-number'>0{index + 1}</span><div className='spotlight-body'><span>{item.studyType} <b>{item.standard}</b></span><h3>{item.title}</h3><p>{item.signal} · معاينة كاملة من 18 صفحة</p></div><span className='spotlight-arrow'><ArrowLeft size={17} /></span>
+                  <span className='spotlight-number'>0{index + 1}</span><div className='spotlight-body'><span>{item.studyType} <b>{item.standard}</b></span><h3>{item.title}</h3><p>{item.signal} · معاينة كاملة من 20 صفحة</p></div><span className='spotlight-arrow'><ArrowLeft size={17} /></span>
                 </motion.button>
               ))}
             </div>
@@ -441,7 +441,7 @@ function App() {
               <motion.section className='library-modal' role='dialog' aria-modal='true' aria-labelledby='library-modal-title' onClick={(event) => event.stopPropagation()} initial={{ opacity: 0, y: 28, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 18, scale: .98 }}>
                 <header className='library-modal-head'><div><span className='eyebrow'>FULL RESEARCH LIBRARY</span><h2 id='library-modal-title'>اختر البحث الذي تريد رؤيته.</h2><p>اضغط على أي نموذج لفتح المعاينة التفاعلية كاملة.</p></div><button type='button' className='library-modal-close' onClick={() => setLibraryOpen(false)} aria-label='إغلاق المكتبة'><X size={19} /></button></header>
                 <div className='library-modal-toolbar'><div className='portfolio-tabs'>{categories.map(({ key, label, icon: Icon }) => <button key={key} type='button' className={portfolioFilter === key ? 'active' : ''} onClick={() => setPortfolioFilter(key)}><Icon size={14} />{label}</button>)}</div><span>{filteredShowcase.length} نماذج</span></div>
-                <motion.div layout className='library-modal-grid'>{filteredShowcase.map((item, index) => <motion.button type='button' layout key={item.id} className='library-modal-item' onClick={() => { setLibraryOpen(false); setActiveSample(item); }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index * .03, .2) }}><span className='modal-item-index'>{String(index + 1).padStart(2, '0')}</span><div><span className='modal-item-meta'>{item.studyType} · {item.standard}</span><h3>{item.title}</h3><p>{item.signal} · 18 صفحة قابلة للتصفح</p></div><ArrowLeft size={17} /></motion.button>)}</motion.div>
+                <motion.div layout className='library-modal-grid'>{filteredShowcase.map((item, index) => <motion.button type='button' layout key={item.id} className='library-modal-item' onClick={() => { setLibraryOpen(false); setActiveSample(item); }} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index * .03, .2) }}><span className='modal-item-index'>{String(index + 1).padStart(2, '0')}</span><div><span className='modal-item-meta'>{item.studyType} · {item.standard}</span><h3>{item.title}</h3><p>{item.signal} · 20 صفحة قابلة للتصفح</p></div><ArrowLeft size={17} /></motion.button>)}</motion.div>
               </motion.section>
             </motion.div>
           )}
